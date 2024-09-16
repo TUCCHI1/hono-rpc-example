@@ -2,7 +2,7 @@ import { Hono } from "hono";
 
 const app = new Hono();
 
-app.post("/rpc", async (c) => {
+const route = app.post("/rpc", async (c) => {
 	const { method, param } = await c.req.json();
 	let result: string | number;
 
@@ -23,3 +23,7 @@ app.post("/rpc", async (c) => {
 
 	return c.json({ result });
 });
+
+export type AppType = typeof route;
+
+export default app;
