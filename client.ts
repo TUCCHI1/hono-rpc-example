@@ -1,19 +1,23 @@
-async function callRpc(method: string, params: string[] | number[]) {
-	const response = await fetch("http://localhost:3000/rpc", {
-		method: "POST",
-		headers: {
-			"Content-Type": "applicattion/json",
-		},
-		body: JSON.stringify({ method, params }),
+import { hc } from "hono/client";
+import type { AppType } from "./server";
+
+const client = hc<AppType>("http://localhost:3000");
+
+async function callRpc(method: string, params: (string | number)[]) {
+	const res = await client.rpc.$post({
+		json: { method, params },
 	});
-	const result = await response.json();
-	return result;
+
+	if (res.ok) {
+		const data = await res.json();
+		console.log(data);
+	} else {
+		const error = await res.json();
+		console.error(error);
+	}
 }
 
 (async () => {
-	const helloRequest = await callRpc("hello", ["World"]);
-	console.log(helloRequest); // { result: "Hello, World!" }
-
-	const addRequest = await callRpc("add", [1, 2]);
-	console.log(addRequest); // { result: 3 }
+	await callRpc("hello", ["world"]); // { result: "Hello, world!" }
+	await callRpc("add", [1, 2]); // { result: 3 }
 })();
