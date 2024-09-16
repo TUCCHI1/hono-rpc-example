@@ -1,20 +1,27 @@
+import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
+import { z } from "zod";
 
 const app = new Hono();
 
-const route = app.post("/rpc", async (c) => {
-	const { method, param } = await c.req.json();
+const rpcSchema = z.object({
+	method: z.string(),
+	paramss: z.array(z.union([z.string(), z.number()])),
+});
+
+const route = app.post("/rpc", zValidator("json", rpcSchema), async (c) => {
+	const { method, params } = await c.req.json();
 	let result: string | number;
 
 	switch (method) {
 		case "hello":
-			result = `Hello, ${param[0]}!`;
+			result = `Hello, ${params[0]}!`;
 			break;
 		case "add":
-			if (typeof param[0] === "number" && typeof param[1] === "number") {
-				result = param[0] + param[1];
+			if (typeof params[0] === "number" && typeof params[1] === "number") {
+				result = params[0] + params[1];
 			} else {
-				result = String(param[0]) + String(param[1]);
+				result = String(params[0]) + String(params[1]);
 			}
 			break;
 		default:
