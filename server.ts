@@ -6,7 +6,7 @@ const app = new Hono();
 
 const rpcSchema = z.object({
 	method: z.string(),
-	paramss: z.array(z.union([z.string(), z.number()])),
+	params: z.array(z.union([z.string(), z.number()])),
 });
 
 const route = app.post("/rpc", zValidator("json", rpcSchema), async (c) => {
